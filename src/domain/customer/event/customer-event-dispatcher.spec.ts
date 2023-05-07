@@ -1,5 +1,7 @@
 import EventDispatcher from "../../@shared/event/event-dispatcher";
+import ChangedAddressEvent from "./changed-address.event";
 import CustomerCreatedEvent from "./customer-created.event";
+import SendConsoleLogAddressHandler from "./handler/send-console-log-address.handler";
 import SendConsoleLog1Handler from "./handler/send-console-log.handler1";
 import SendConsoleLog2Handler from "./handler/send-console-log.handler2";
 
@@ -47,5 +49,24 @@ describe ("customer event dispatcher test", () => {
 
         expect(spyEventHandler1).toHaveBeenCalled();
         expect(spyEventHandler2).toHaveBeenCalled();
+    });
+
+    it("should notify when an address changes", () => {
+        const eventDispatcher = new EventDispatcher();
+        const eventHandler = new SendConsoleLogAddressHandler();
+
+        eventDispatcher.register("ChangedAddressEvent", eventHandler);
+        
+        const spyEventHandler = jest.spyOn(eventHandler, "handle");
+
+        const changeAddressEvent = new ChangedAddressEvent({
+            id: 1,
+            nome: "Allyson",
+            endereco: "Porto Alegre - RS, Rua do Pardal nº 167 Centro"
+        }); 
+
+        eventDispatcher.notify(changeAddressEvent);
+
+        expect(spyEventHandler).toBeCalled();
     });
 });
